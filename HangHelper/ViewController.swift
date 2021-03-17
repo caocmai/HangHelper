@@ -54,12 +54,28 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             
             if !results.isEmpty {
                 print("touched plane")
-                print(results.first!)
+                let hitResult = (results.first!)
+                displayDot(at: hitResult)
             } else {
                 print("touched somewhere else")
             }
         }
         
+        
+    }
+    
+    func displayDot(at hitResult: ARHitTestResult) {
+        let dotGeo = SCNSphere(radius: 0.005)
+        let material = SCNMaterial()
+        material.diffuse.contents = UIColor.red
+        
+        dotGeo.materials = [material]
+        
+        let dotNode = SCNNode(geometry: dotGeo)
+        
+        dotNode.position = SCNVector3(x: hitResult.worldTransform.columns.3.x, y: hitResult.worldTransform.columns.3.y, z: hitResult.worldTransform.columns.3.z)
+        
+        sceneView.scene.rootNode.addChildNode(dotNode)
         
     }
     
