@@ -56,6 +56,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
                 print("touched plane")
                 let hitResult = (results.first!)
                 displayDot(at: hitResult)
+                addText(text: "Hello World", hitResult: hitResult)
             } else {
                 print("touched somewhere else")
             }
@@ -78,6 +79,20 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         sceneView.scene.rootNode.addChildNode(dotNode)
         
     }
+    
+    func addText(text: String, hitResult: ARHitTestResult) {
+        let textGeometry = SCNText(string: text, extrusionDepth: 1.0)
+        
+        textGeometry.firstMaterial?.diffuse.contents = UIColor.blue
+        
+        let textNode = SCNNode(geometry: textGeometry)
+        
+        textNode.position =  SCNVector3(x: hitResult.worldTransform.columns.3.x, y: hitResult.worldTransform.columns.3.y + 0.01, z: hitResult.worldTransform.columns.3.z)
+        textNode.scale = SCNVector3(0.01, 0.01, 0.0)
+        
+        sceneView.scene.rootNode.addChildNode(textNode)
+    }
+    
     
     func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
         if anchor is ARPlaneAnchor {
