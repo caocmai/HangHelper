@@ -13,6 +13,10 @@ class ViewController: UIViewController, ARSCNViewDelegate {
 
     @IBOutlet var sceneView: ARSCNView!
     
+    var nodes = [SCNNode]()
+    
+    var textNode = SCNNode()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -56,7 +60,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
                 print("touched plane")
                 let hitResult = (results.first!)
                 displayDot(at: hitResult)
-                addText(text: "Hello World", hitResult: hitResult)
+//                addText(text: "Hello World", hitResult: hitResult)
             } else {
                 print("touched somewhere else")
             }
@@ -66,6 +70,18 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     }
     
     func displayDot(at hitResult: ARHitTestResult) {
+        
+        if nodes.count == 2 {
+            for node in nodes {
+                node.removeFromParentNode()
+            }
+            nodes = []
+            
+            textNode.removeFromParentNode()
+            
+            
+        }
+        
         let dotGeo = SCNSphere(radius: 0.005)
         let material = SCNMaterial()
         material.diffuse.contents = UIColor.red
@@ -78,16 +94,36 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         sceneView.scene.rootNode.addChildNode(dotNode)
         
+        nodes.append(dotNode)
+        
+        if nodes.count >= 2 {
+            calculate()
+        }
+        
     }
     
-    func addText(text: String, hitResult: ARHitTestResult) {
+    func calculate() {
+        let start = nodes[0]
+        let end = nodes[1]
+        
+        let a = end.position.x - start.position.x
+        let b = end.position.y - start.position.y
+        let c = end.position.z - start.position.z
+        
+        let distance = sqrt(pow(a, 2) + pow(b, 2) + pow(c, 2))
+        
+        let stringDistance = abs(distance)
+        addText(text: "\(stringDistance)", hitResult: end)
+    }
+    
+    func addText(text: String, hitResult: SCNNode) {
         let textGeometry = SCNText(string: text, extrusionDepth: 1.0)
         
         textGeometry.firstMaterial?.diffuse.contents = UIColor.blue
         
-        let textNode = SCNNode(geometry: textGeometry)
+        textNode = SCNNode(geometry: textGeometry)
         
-        textNode.position =  SCNVector3(x: hitResult.worldTransform.columns.3.x, y: hitResult.worldTransform.columns.3.y + 0.01, z: hitResult.worldTransform.columns.3.z)
+        textNode.position =  SCNVector3(x: hitResult.position.x, y: hitResult.position.y + 0.1, z: hitResult.position.z)
         textNode.scale = SCNVector3(0.01, 0.01, 0.0)
         
         sceneView.scene.rootNode.addChildNode(textNode)
