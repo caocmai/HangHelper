@@ -72,16 +72,19 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
     }
     
-    func addDot(at hitResult: ARRaycastResult) {
-        
+    func resetRuler() {
         if nodes.count >= 2 {
             for node in nodes {
                 node.removeFromParentNode()
             }
             nodes = []
             textNode.removeFromParentNode()
-            
         }
+    }
+    
+    func addDot(at hitResult: ARRaycastResult) {
+        
+        resetRuler()
         
         let dotGeo = SCNSphere(radius: 0.005)
         let material = SCNMaterial()
@@ -91,9 +94,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         let dotNode = SCNNode(geometry: dotGeo)
         
-        
         dotNode.position = SCNVector3(x: hitResult.worldTransform.columns.3.x, y: hitResult.worldTransform.columns.3.y, z: hitResult.worldTransform.columns.3.z)
-        
         
         sceneView.scene.rootNode.addChildNode(dotNode)
         
@@ -116,7 +117,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         let distance = sqrt(pow(a, 2) + pow(b, 2) + pow(c, 2))
         
         let stringDistance = abs(distance)
-        let inches = ToInches(meter: stringDistance)
+        let inches = MeterToInches(meter: stringDistance)
         addText(text: "\(inches.convertToInches())", hitResult: end)
     }
     
@@ -191,16 +192,5 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     func sessionInterruptionEnded(_ session: ARSession) {
         // Reset tracking and/or remove existing anchors if consistent tracking is required
         
-    }
-}
-
-struct ToInches {
-    let meter: Float
-    
-    func convertToInches() -> Float {
-        var inches: Float = 0.0
-        inches = meter * 39.3701
-        
-        return inches
     }
 }

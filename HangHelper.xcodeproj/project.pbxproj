@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2C795DB62604082B00B47094 /* MeterToInches.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C795DB52604082B00B47094 /* MeterToInches.swift */; };
 		2CE6FC1E260061E000E2026B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CE6FC1D260061E000E2026B /* AppDelegate.swift */; };
 		2CE6FC20260061E000E2026B /* art.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = 2CE6FC1F260061E000E2026B /* art.scnassets */; };
 		2CE6FC22260061E000E2026B /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CE6FC21260061E000E2026B /* ViewController.swift */; };
@@ -16,6 +17,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2C795DB52604082B00B47094 /* MeterToInches.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeterToInches.swift; sourceTree = "<group>"; };
 		2CE6FC1A260061E000E2026B /* HangHelper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HangHelper.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2CE6FC1D260061E000E2026B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2CE6FC1F260061E000E2026B /* art.scnassets */ = {isa = PBXFileReference; lastKnownFileType = wrapper.scnassets; path = art.scnassets; sourceTree = "<group>"; };
@@ -37,6 +39,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2C795DB82604083400B47094 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				2C795DB52604082B00B47094 /* MeterToInches.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
 		2CE6FC11260061E000E2026B = {
 			isa = PBXGroup;
 			children = (
@@ -59,6 +69,7 @@
 				2CE6FC1D260061E000E2026B /* AppDelegate.swift */,
 				2CE6FC1F260061E000E2026B /* art.scnassets */,
 				2CE6FC21260061E000E2026B /* ViewController.swift */,
+				2C795DB82604083400B47094 /* Model */,
 				2CE6FC23260061E000E2026B /* Main.storyboard */,
 				2CE6FC26260061E000E2026B /* Assets.xcassets */,
 				2CE6FC28260061E000E2026B /* LaunchScreen.storyboard */,
@@ -140,6 +151,7 @@
 			files = (
 				2CE6FC22260061E000E2026B /* ViewController.swift in Sources */,
 				2CE6FC1E260061E000E2026B /* AppDelegate.swift in Sources */,
+				2C795DB62604082B00B47094 /* MeterToInches.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
