@@ -10,7 +10,7 @@ import SceneKit
 import ARKit
 
 class ViewController: UIViewController, ARSCNViewDelegate {
-
+    
     @IBOutlet var sceneView: ARSCNView!
     
     var nodes = [SCNNode]()
@@ -41,8 +41,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // Create a session configuration
         let configuration = ARWorldTrackingConfiguration()
         
+        // Probably don't need this
         configuration.planeDetection = .horizontal
-        
         
 
         // Run the view's session
@@ -54,13 +54,16 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             
             let touchLocation = touch.location(in: sceneView)
             
-            let results = sceneView.hitTest(touchLocation, types: .existingPlane)
+            //            let results = sceneView.hitTest(touchLocation, types: .existingPlane)
+            
+            let rayResults = sceneView.raycastQuery(from: touchLocation, allowing: .existingPlaneInfinite, alignment: .horizontal)!
+            
+            let results = sceneView.session.raycast(rayResults)
             
             if !results.isEmpty {
                 print("touched plane")
                 let hitResult = (results.first!)
-                displayDot(at: hitResult)
-//                addText(text: "Hello World", hitResult: hitResult)
+                addDot(at: hitResult)
             } else {
                 print("touched somewhere else")
             }
@@ -69,16 +72,14 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
     }
     
-    func displayDot(at hitResult: ARHitTestResult) {
+    func addDot(at hitResult: ARRaycastResult) {
         
-        if nodes.count == 2 {
+        if nodes.count >= 2 {
             for node in nodes {
                 node.removeFromParentNode()
             }
             nodes = []
-            
             textNode.removeFromParentNode()
-            
             
         }
         
@@ -90,7 +91,9 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         let dotNode = SCNNode(geometry: dotGeo)
         
+        
         dotNode.position = SCNVector3(x: hitResult.worldTransform.columns.3.x, y: hitResult.worldTransform.columns.3.y, z: hitResult.worldTransform.columns.3.z)
+        
         
         sceneView.scene.rootNode.addChildNode(dotNode)
         
@@ -113,7 +116,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         let distance = sqrt(pow(a, 2) + pow(b, 2) + pow(c, 2))
         
         let stringDistance = abs(distance)
-        addText(text: "\(stringDistance)", hitResult: end)
+        let inches = ToInches(meter: stringDistance)
+        addText(text: "\(inches.convertToInches())", hitResult: end)
     }
     
     func addText(text: String, hitResult: SCNNode) {
@@ -162,17 +166,17 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // Pause the view's session
         sceneView.session.pause()
     }
-
+    
     // MARK: - ARSCNViewDelegate
     
-/*
-    // Override to create and configure nodes for anchors added to the view's session.
-    func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
-        let node = SCNNode()
+    /*
+     // Override to create and configure nodes for anchors added to the view's session.
+     func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
+     let node = SCNNode()
      
-        return node
-    }
-*/
+     return node
+     }
+     */
     
     func session(_ session: ARSession, didFailWithError error: Error) {
         // Present an error message to the user
@@ -187,5 +191,16 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     func sessionInterruptionEnded(_ session: ARSession) {
         // Reset tracking and/or remove existing anchors if consistent tracking is required
         
+    }
+}
+
+struct ToInches {
+    let meter: Float
+    
+    func convertToInches() -> Float {
+        var inches: Float = 0.0
+        inches = meter * 39.3701
+        
+        return inches
     }
 }
