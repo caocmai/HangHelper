@@ -118,7 +118,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         let stringDistance = abs(distance)
         let inches = MeterToInches(meter: stringDistance)
-        addText(text: "\(inches.convertToInches())", hitResult: end)
+        addText(text: "\(inches.toFeetAndInches())", hitResult: end)
     }
     
     func addText(text: String, hitResult: SCNNode) {
