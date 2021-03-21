@@ -17,6 +17,9 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     
     var textNode = SCNNode()
     
+    var middleNode = SCNNode()
+    var lineBetweenNode = SCNNode()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -79,6 +82,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             }
             nodes = []
             textNode.removeFromParentNode()
+            middleNode.removeFromParentNode()
+            lineBetweenNode.removeFromParentNode()
         }
     }
     
@@ -130,13 +135,13 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         dotGeo.materials = [material]
         
-        let dotNode = SCNNode(geometry: dotGeo)
+        middleNode = SCNNode(geometry: dotGeo)
         
-        dotNode.position = middlePosition
+        middleNode.position = middlePosition
         
-        sceneView.scene.rootNode.addChildNode(dotNode)
+        sceneView.scene.rootNode.addChildNode(middleNode)
         
-        nodes.append(dotNode)
+        nodes.append(middleNode)
         
     }
     
@@ -173,9 +178,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         material.lightingModel = .phong
         line.materials = [material]
         
-        let newLineNode = SCNNode()
-        newLineNode.geometry = line
-        newLineNode.position = middlePosition(first: node1.position, second: node2.position)
+        lineBetweenNode.geometry = line
+        lineBetweenNode.position = middlePosition(first: node1.position, second: node2.position)
         
         let betweenVector = SCNVector3Make(node2.position.x - node1.position.x, node2.position.y - node1.position.y, node2.position.z - node1.position.z)
         
@@ -183,11 +187,11 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         let yAngle = atan(betweenVector.x / betweenVector.z)
         
         // Rotate cylinder node about X axis so cylinder is laying down
-        newLineNode.eulerAngles.x = .pi / 2
+        lineBetweenNode.eulerAngles.x = .pi / 2
         
         // Rotate cylinder node about Y axis so cylinder is pointing to each node
-        newLineNode.eulerAngles.y = yAngle
-        return newLineNode
+        lineBetweenNode.eulerAngles.y = yAngle
+        return lineBetweenNode
         
     }
     
