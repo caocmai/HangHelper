@@ -28,11 +28,11 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // Show statistics such as fps and timing information
         sceneView.showsStatistics = true
         
-        // Create a new scene
-        let scene = SCNScene(named: "art.scnassets/ship.scn")!
-        
-        // Set the scene to the view
-        sceneView.scene = scene
+        //        // Create a new scene
+        //        let scene = SCNScene(named: "art.scnassets/ship.scn")!
+        //
+        //        // Set the scene to the view
+        //        sceneView.scene = scene
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -44,7 +44,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // Probably don't need this
         configuration.planeDetection = .horizontal
         
-
+        
         // Run the view's session
         sceneView.session.run(configuration)
     }
@@ -119,6 +119,36 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         let stringDistance = abs(distance)
         let inches = MeterToInches(meter: stringDistance)
         addText(text: "\(inches.toFeetAndInches())", hitResult: end)
+        
+        let lineBetweenNode = getLineBetweenNode(node1: start, node2: end)
+        
+        sceneView.scene.rootNode.addChildNode(lineBetweenNode)
+        
+        
+        let dotGeo = SCNSphere(radius: 0.005)
+        let material = SCNMaterial()
+        material.diffuse.contents = UIColor.green
+        
+        dotGeo.materials = [material]
+        
+        let dotNode = SCNNode(geometry: dotGeo)
+        
+        dotNode.position = middlePosition(first: start.position, second: end.position)
+        
+        sceneView.scene.rootNode.addChildNode(dotNode)
+        
+        nodes.append(dotNode)
+    }
+    
+    func getDistance() -> Float {
+        let start = nodes[0]
+        let end = nodes[1]
+        
+        let a = end.position.x - start.position.x
+        let b = end.position.y - start.position.y
+        let c = end.position.z - start.position.z
+        
+        return sqrt(pow(a, 2) + pow(b, 2) + pow(c, 2))
     }
     
     func addText(text: String, hitResult: SCNNode) {
@@ -132,6 +162,37 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         textNode.scale = SCNVector3(0.01, 0.01, 0.0)
         
         sceneView.scene.rootNode.addChildNode(textNode)
+    }
+    
+//    https://stackoverflow.com/questions/35002232/draw-scenekit-object-between-two-points
+    func getLineBetweenNode(node1: SCNNode, node2: SCNNode) -> SCNNode {
+        let line = SCNCylinder(radius: 0.002, height: CGFloat(getDistance()))
+        
+        let material = SCNMaterial()
+        material.diffuse.contents = UIColor.red
+        material.lightingModel = .phong
+        line.materials = [material]
+        
+        let newLineNode = SCNNode()
+        newLineNode.geometry = line
+        newLineNode.position = middlePosition(first: node1.position, second: node2.position)
+        
+        let betweenVector = SCNVector3Make(node2.position.x - node1.position.x, node2.position.y - node1.position.y, node2.position.z - node1.position.z)
+        
+        // Get Y rotation in radians
+        let yAngle = atan(betweenVector.x / betweenVector.z)
+        
+        // Rotate cylinder node about X axis so cylinder is laying down
+        newLineNode.eulerAngles.x = .pi / 2
+        
+        // Rotate cylinder node about Y axis so cylinder is pointing to each node
+        newLineNode.eulerAngles.y = yAngle
+        return newLineNode
+        
+    }
+    
+    func middlePosition(first: SCNVector3, second: SCNVector3) -> SCNVector3 {
+        return SCNVector3Make((first.x + second.x) / 2, (first.y + second.y) / 2, (first.z + second.z) / 2)
     }
     
     
