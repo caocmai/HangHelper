@@ -19,7 +19,7 @@ struct MeterToInches {
             
             inches = inches - Float(feet * 12)
             
-            return String(feet) + "ft" + numToString(number: inches) + "in"
+            return String(feet) + "'" + numToString(number: inches) + "in"
         }
         
         return numToString(number: inches) + "in"

@@ -15,6 +15,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     
     var nodes = [SCNNode]()
     
+    let bubbleDepth: Float = 0.01
+    
     var textNode = SCNNode()
     
     var middleNode = SCNNode()
@@ -30,6 +32,9 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         // Show statistics such as fps and timing information
         sceneView.showsStatistics = true
+        
+        sceneView.autoenablesDefaultLighting = true
+
         
         //        // Create a new scene
         //        let scene = SCNScene(named: "art.scnassets/ship.scn")!
@@ -59,7 +64,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             
             //            let results = sceneView.hitTest(touchLocation, types: .existingPlane)
             
-            let rayResults = sceneView.raycastQuery(from: touchLocation, allowing: .existingPlaneInfinite, alignment: .horizontal)!
+            let rayResults = sceneView.raycastQuery(from: touchLocation, allowing: .existingPlaneInfinite, alignment: .any)!
             
             let results = sceneView.session.raycast(rayResults)
             
@@ -116,14 +121,18 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         let end = nodes[1]
         
         let stringDistance = distanceBetweenNodes(start: start, end: end)
-        let inches = MeterToInches(meter: stringDistance)
-        addText(text: "\(inches.toFeetAndInches())", hitResult: end)
+        let meters = MeterToInches(meter: stringDistance)
+//        addText(text: "\(meters.toFeetAndInches())", hitResult: end)
+        
+        textNode = createTextNode(meters.toFeetAndInches())
+        textNode.position = middlePosition(first: start.position, second: end.position)
+        sceneView.scene.rootNode.addChildNode(textNode)
         
         let lineBetweenNode = getLineBetweenNode(node1: start, node2: end)
         
         sceneView.scene.rootNode.addChildNode(lineBetweenNode)
         
-        drawMiddleNode(middlePosition: middlePosition(first: start.position, second: end.position))
+//        drawMiddleNode(middlePosition: middlePosition(first: start.position, second: end.position))
         
         
     }
@@ -143,6 +152,44 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         nodes.append(middleNode)
         
+    }
+    
+    func createTextNode(_ text : String) -> SCNNode {
+        
+        let billboardConstraint = SCNBillboardConstraint()
+        billboardConstraint.freeAxes = SCNBillboardAxis.Y
+        
+        // Bubble text
+        let bubble = SCNText(string: text, extrusionDepth: CGFloat(bubbleDepth))
+        let font = UIFont(name: "Futura", size: 0.15)
+//        font = font?.withTraits(traits: .traitBold)
+        bubble.font = font
+        bubble.alignmentMode = CATextLayerAlignmentMode.center.rawValue
+        bubble.firstMaterial?.diffuse.contents = UIColor.orange
+//        bubble.firstMaterial?.specular.contents = UIColor.white
+        bubble.firstMaterial?.isDoubleSided = true
+        bubble.chamferRadius = CGFloat(bubbleDepth)
+        
+        // Bubble node
+        let (minBound, maxBound) = bubble.boundingBox
+        let bubbleNode = SCNNode(geometry: bubble)
+        // Centre Node - to Centre-Bottom point
+        bubbleNode.pivot = SCNMatrix4MakeTranslation( (maxBound.x - minBound.x)/2, minBound.y, bubbleDepth/2)
+        // Reduce default text size
+        bubbleNode.scale = SCNVector3Make(0.2, 0.2, 0.2)
+        
+        // Center point node
+        let sphere = SCNSphere(radius: 0.005)
+        sphere.firstMaterial?.diffuse.contents = UIColor.cyan
+        let sphereNode = SCNNode(geometry: sphere)
+        
+        // Bubble parent node
+        let bubbleNodeParent = SCNNode()
+        bubbleNodeParent.addChildNode(bubbleNode)
+        bubbleNodeParent.addChildNode(sphereNode)
+        bubbleNodeParent.constraints = [billboardConstraint]
+        
+        return bubbleNodeParent
     }
     
     func distanceBetweenNodes(start: SCNNode, end: SCNNode) -> Float {
