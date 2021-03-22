@@ -50,7 +50,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         let configuration = ARWorldTrackingConfiguration()
         
         // Probably don't need this
-        configuration.planeDetection = .horizontal
+        configuration.planeDetection = .vertical
         
         
         // Run the view's session
@@ -64,12 +64,13 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             
             //            let results = sceneView.hitTest(touchLocation, types: .existingPlane)
             
-            let rayResults = sceneView.raycastQuery(from: touchLocation, allowing: .existingPlaneInfinite, alignment: .any)!
+            let rayResults = sceneView.raycastQuery(from: touchLocation, allowing: .existingPlaneInfinite, alignment: .vertical)!
             
             let results = sceneView.session.raycast(rayResults)
             
             if !results.isEmpty {
                 print("touched plane")
+//                print(results.first?.worldTransform.columns.3.x, results.first?.worldTransform.columns.3.y, results.first?.worldTransform.columns.3.z)
                 let hitResult = (results.first!)
                 addDot(at: hitResult)
             } else {
@@ -120,39 +121,76 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         let start = nodes[0]
         let end = nodes[1]
         
-        let stringDistance = distanceBetweenNodes(start: start, end: end)
-        let meters = MeterToInches(meter: stringDistance)
-//        addText(text: "\(meters.toFeetAndInches())", hitResult: end)
+        let start2 = nodes[0].clone()
+        let end2 = nodes[1].clone()
         
+
+        let distanceInMeters = distanceBetweenNodes(start: start, end: end)
+        let meters = MeterToInches(meter: distanceInMeters)
         textNode = createTextNode(meters.toFeetAndInches())
         textNode.position = middlePosition(first: start.position, second: end.position)
         sceneView.scene.rootNode.addChildNode(textNode)
         
-        let lineBetweenNode = getLineBetweenNode(node1: start, node2: end)
+//        let lineBetweenNode = getLineBetweenNode(node1: start, node2: end)
+//        sceneView.scene.rootNode.addChildNode(lineBetweenNode)
         
-        sceneView.scene.rootNode.addChildNode(lineBetweenNode)
+        print("Start position", start.position.x, start.position.y, start.position.z)
+        print("End Positino", end.position.x, end.position.y, end.position.z)
+
+        
+        let line = SCNGeometry.line(from: start.position, to: end.position)
+        
+//        let newVectorStart = SCNVector3Make(start.position.x, start.position.y + 5, start.position.z)
+//        let newVectorEnd = SCNVector3Make(end.position.x, end.position.y + 5, end.position.z)
+
+        let lineNode = SCNNode(geometry: line)
+        lineNode.position = SCNVector3Zero
+        sceneView.scene.rootNode.addChildNode(lineNode)
+
+        
+        for _ in 1...10 {
+            start.position.x -= 0.07
+            end.position.x += 0.07
+            
+            start2.position.x -= 0.07
+            end2.position.x += 0.07
+        }
+
+    
+        for _ in 1...10 {
+            start.position.y += 0.07
+            end.position.y += 0.07
+
+            let line = SCNGeometry.line(from: start.position, to: end.position)
+
+            let lineNode = SCNNode(geometry: line)
+            lineNode.position = SCNVector3Zero
+            sceneView.scene.rootNode.addChildNode(lineNode)
+
+        }
+        
         
 //        drawMiddleNode(middlePosition: middlePosition(first: start.position, second: end.position))
         
         
     }
-    
-    func drawMiddleNode(middlePosition: SCNVector3) {
-        let dotGeo = SCNSphere(radius: 0.005)
-        let material = SCNMaterial()
-        material.diffuse.contents = UIColor.green
-        
-        dotGeo.materials = [material]
-        
-        middleNode = SCNNode(geometry: dotGeo)
-        
-        middleNode.position = middlePosition
-        
-        sceneView.scene.rootNode.addChildNode(middleNode)
-        
-        nodes.append(middleNode)
-        
-    }
+//
+//    func drawMiddleNode(middlePosition: SCNVector3) {
+//        let dotGeo = SCNSphere(radius: 0.005)
+//        let material = SCNMaterial()
+//        material.diffuse.contents = UIColor.green
+//
+//        dotGeo.materials = [material]
+//
+//        middleNode = SCNNode(geometry: dotGeo)
+//
+//        middleNode.position = middlePosition
+//
+//        sceneView.scene.rootNode.addChildNode(middleNode)
+//
+//        nodes.append(middleNode)
+//
+//    }
     
     func createTextNode(_ text : String) -> SCNNode {
         
@@ -306,3 +344,53 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
     }
 }
+
+
+extension SCNGeometry {
+    class func line(from vector1: SCNVector3, to vector2: SCNVector3) -> SCNGeometry {
+        let indices: [Int32] = [0, 1]
+        let source = SCNGeometrySource(vertices: [vector1, vector2])
+        let element = SCNGeometryElement(indices: indices, primitiveType: .line)
+        return SCNGeometry(sources: [source], elements: [element])
+    }
+}
+
+///looks like y is the thing that's getting smaller when you go up
+//Start position -0.013950694 -0.29768142 -0.8087494
+//End Positino 0.10948597 -0.29737473 -0.824081
+//touched plane
+//touched plane
+//Start position -0.0124802925 -0.123720184 -0.80968
+//End Positino 0.09759191 -0.12262655 -0.8233552
+//touched plane
+//touched plane
+//Start position -0.015157804 -0.027880251 -0.81265146
+//End Positino 0.08202456 -0.025717713 -0.8261197
+
+
+//Start position -0.045311995 -0.2245927 -0.35887483
+//End Positino -0.013480216 -0.21830407 -0.35993907
+//touched plane
+//touched plane
+//Start position -0.11578967 -0.18739304 -0.35763702
+//End Positino 0.096940465 -0.1807105 -0.36483467
+//touched plane
+//touched plane
+//Start position -0.13999453 -0.022936732 -0.360219
+//End Positino 0.11313399 -0.020511314 -0.3686698
+
+
+//Start position -0.19611076 -0.04121199 -0.53352785
+//End Positino -0.10675386 -0.042285185 -0.55700594
+//touched plane
+//touched plane
+//Start position -0.35618916 -0.0049450807 -0.48500314
+//End Positino 0.09505594 0.008563001 -0.6164749
+//touched plane
+//touched plane
+//Start position -0.46825647 0.1032953 -0.46887752
+//End Positino 0.11511024 0.13835233 -0.64191765
+//touched plane
+//touched plane
+//Start position -0.5193834 0.23614614 -0.4532935
+//End Positino 0.16265216 0.25515363 -0.6586266
