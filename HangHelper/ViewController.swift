@@ -22,6 +22,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     var middleNode = SCNNode()
     var lineBetweenNode = SCNNode()
     
+    let planeDetectLabel = UILabel()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -358,11 +360,24 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             //            planeNode.geometry = plane
             //
             //            node.addChildNode(planeNode)
-            print("plane!")
-            
+            DispatchQueue.main.async {
+                self.addPlaneDetectedLabel(text: "Plane Detected")
+            }
         } else {
             return
         }
+    }
+    
+    func addPlaneDetectedLabel(text: String) {
+        self.view.addSubview(planeDetectLabel)
+        planeDetectLabel.translatesAutoresizingMaskIntoConstraints = false
+        planeDetectLabel.text = text
+        planeDetectLabel.textColor = .green
+        
+        NSLayoutConstraint.activate([
+            planeDetectLabel.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: 10),
+            planeDetectLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
+        ])
     }
     
     override func viewWillDisappear(_ animated: Bool) {
