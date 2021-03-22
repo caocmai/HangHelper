@@ -16,9 +16,9 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     let planeDetectLabel = UILabel()
     var rulerNodes = [SCNNode]()
     let bubbleDepth: Float = 0.01
-//    var textNode = SCNNode()
-//    var middleNode = SCNNode()
-//    var lineBetweenNode = SCNNode()
+    //    var textNode = SCNNode()
+    //    var middleNode = SCNNode()
+    //    var lineBetweenNode = SCNNode()
     
     var gridNodes = [SCNNode]()
     var gridMode = false
@@ -65,30 +65,30 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     
     
     @IBAction func clearButton(_ sender: UIButton) {
-//        print("tapped redo button")
-//        if rulerNodes.count > 0 {
-//            let poppedNode = rulerNodes.popLast()
-//            poppedNode?.removeFromParentNode()
-//        }
+        //        print("tapped redo button")
+        //        if rulerNodes.count > 0 {
+        //            let poppedNode = rulerNodes.popLast()
+        //            poppedNode?.removeFromParentNode()
+        //        }
         if rulerNodes.count > 0 {
             for node in rulerNodes {
                 node.removeFromParentNode()
             }
         }
         
-//        if gridNodes.count > 0 {
-//            for node in gridNodes {
-//                node.removeFromParentNode()
-//            }
-//        }
+        //        if gridNodes.count > 0 {
+        //            for node in gridNodes {
+        //                node.removeFromParentNode()
+        //            }
+        //        }
     }
     
     @IBAction func gridButtonTapped(_ sender: Any) {
         if !gridMode {
-            gridButton.setTitle("GridMode", for: .normal)
+            gridButton.setTitle("Grid: On", for: .normal)
             gridMode = true
         } else {
-            gridButton.setTitle("RulerMode", for: .normal)
+            gridButton.setTitle("Ruler: On", for: .normal)
             gridMode = false
         }
         
@@ -105,26 +105,39 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             
             let results = sceneView.session.raycast(rayResults)
             
-            if !gridMode {
-                
-                if !results.isEmpty {
-                    print("touched plane")
-                    //                print(results.first?.worldTransform.columns.3.x, results.first?.worldTransform.columns.3.y, results.first?.worldTransform.columns.3.z)
-                    let hitResult = (results.first!)
-                    addDotForRuler(at: hitResult)
-                } else {
-                    print("touched somewhere else")
+            if !results.isEmpty {
+                if let hitResult = results.first {
+                    
+                    if !gridMode {
+                        addDotForRuler(at: hitResult)
+                    } else {
+                        addDotForGrid(at: hitResult)
+                    }
                 }
             } else {
-                print("grid mode")
-                if !results.isEmpty {
-                    print("touched plane")
-                    let hitResult = (results.first!)
-                    addDotForGrid(at: hitResult)
-                } else {
-                    print("touched somewhere else")
-                }
+                print("touched somewhere else")
             }
+            
+            //            if !gridMode {
+            //
+            //                if !results.isEmpty {
+            //                    print("touched plane")
+            //                    //                print(results.first?.worldTransform.columns.3.x, results.first?.worldTransform.columns.3.y, results.first?.worldTransform.columns.3.z)
+            //                    let hitResult = (results.first!)
+            //                    addDotForRuler(at: hitResult)
+            //                } else {
+            //                    print("touched somewhere else")
+            //                }
+            //            } else {
+            //                print("grid mode")
+            //                if !results.isEmpty {
+            //                    print("touched plane")
+            //                    let hitResult = (results.first!)
+            //                    addDotForGrid(at: hitResult)
+            //                } else {
+            //                    print("touched somewhere else")
+            //                }
+            //            }
         }
         
         
@@ -136,9 +149,9 @@ class ViewController: UIViewController, ARSCNViewDelegate {
                 node.removeFromParentNode()
             }
             rulerNodes = []
-//            textNode.removeFromParentNode()
-//            middleNode.removeFromParentNode()
-//            lineBetweenNode.removeFromParentNode()
+            //            textNode.removeFromParentNode()
+            //            middleNode.removeFromParentNode()
+            //            lineBetweenNode.removeFromParentNode()
         }
     }
     
@@ -157,7 +170,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     func addDotForRuler(at hitResult: ARRaycastResult) {
         
         dotCount += 1
-//        resetRuler()
+        //        resetRuler()
         let dot = createDot(position: hitResult)
         
         sceneView.scene.rootNode.addChildNode(dot)
@@ -182,7 +195,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         if gridNodes.count == 2 {
             generateGrid(start: gridNodes[0], end: gridNodes[1])
         }
-
+        
     }
     
     func resetGrid() {
@@ -224,9 +237,9 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     }
     
     func calculateDistance(start: SCNNode, end: SCNNode) {
-//
-//        let start = rulerNodes[0]
-//        let end = rulerNodes[1]
+        //
+        //        let start = rulerNodes[0]
+        //        let end = rulerNodes[1]
         
         let distanceInMeters = distanceBetweenNodes(start: start, end: end)
         let meters = MeterToInches(meter: distanceInMeters)
@@ -243,80 +256,80 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     }
     
     
-//    func calculate() {
-//        let start2 = rulerNodes[0].clone()
-//        let end2 = rulerNodes[1].clone()
-//
-//        let start = rulerNodes[0]
-//        let end = rulerNodes[1]
-//
-//        let distanceInMeters = distanceBetweenNodes(start: start, end: end)
-//        let meters = MeterToInches(meter: distanceInMeters)
-//        textNode = createTextNode(meters.toFeetAndInches())
-//        textNode.position = middlePosition(first: start.position, second: end.position)
-//        sceneView.scene.rootNode.addChildNode(textNode)
-//
-//        let node = lineBetweenNodes(positionA: start.position, positionB: end.position, inScene: sceneView.scene)
-//        sceneView.scene.rootNode.addChildNode(node)
-//
-//
-//        //        let lineBetweenNode = getLineBetweenNode(node1: start, node2: end)
-//        //        sceneView.scene.rootNode.addChildNode(lineBetweenNode)
-//
-//        print("Start position", start.position.x, start.position.y, start.position.z)
-//        print("End Positino", end.position.x, end.position.y, end.position.z)
-//
-//
-//        let line = SCNGeometry.line(from: start.position, to: end.position)
-//
-//        //        let newVectorStart = SCNVector3Make(start.position.x, start.position.y + 5, start.position.z)
-//        //        let newVectorEnd = SCNVector3Make(end.position.x, end.position.y + 5, end.position.z)
-//
-//        let lineNode = SCNNode(geometry: line)
-//        lineNode.position = SCNVector3Zero
-//        sceneView.scene.rootNode.addChildNode(lineNode)
-//
-//
-//        //                for _ in 1...10 {
-//        //                    start.position.x -= 0.04
-//        ////                    start.position.z += 0.008
-//        //                    end.position.x += 0.04
-//        ////                    end.position.z -= 0.008
-//        //
-//        //                }
-//
-//        //        start.eulerAngles.x = -.pi/2
-//        //        end.eulerAngles.x = -.pi/2
-//
-//
-//        for _ in 1...20 {
-//            //                    start.position.x -= 0.03
-//            start.position.y += 0.03
-//            //                    end.position.x += 0.03
-//            end.position.y += 0.03
-//
-//            let node = lineBetweenNodes(positionA: start.position, positionB: end.position, inScene: sceneView.scene)
-//            sceneView.scene.rootNode.addChildNode(node)
-//
-//        }
-//        //
-//        for _ in 1...20 {
-//            //                    start2.position.x -= 0.03
-//            start2.position.y -= 0.03
-//            //                    end2.position.x += 0.03
-//            end2.position.y -= 0.03
-//
-//            let line = SCNGeometry.line(from: start2.position, to: end2.position)
-//
-//            let lineNode = SCNNode(geometry: line)
-//            lineNode.position = SCNVector3Zero
-//            sceneView.scene.rootNode.addChildNode(lineNode)
-//
-//        }
-//
-//
-//
-//    }
+    //    func calculate() {
+    //        let start2 = rulerNodes[0].clone()
+    //        let end2 = rulerNodes[1].clone()
+    //
+    //        let start = rulerNodes[0]
+    //        let end = rulerNodes[1]
+    //
+    //        let distanceInMeters = distanceBetweenNodes(start: start, end: end)
+    //        let meters = MeterToInches(meter: distanceInMeters)
+    //        textNode = createTextNode(meters.toFeetAndInches())
+    //        textNode.position = middlePosition(first: start.position, second: end.position)
+    //        sceneView.scene.rootNode.addChildNode(textNode)
+    //
+    //        let node = lineBetweenNodes(positionA: start.position, positionB: end.position, inScene: sceneView.scene)
+    //        sceneView.scene.rootNode.addChildNode(node)
+    //
+    //
+    //        //        let lineBetweenNode = getLineBetweenNode(node1: start, node2: end)
+    //        //        sceneView.scene.rootNode.addChildNode(lineBetweenNode)
+    //
+    //        print("Start position", start.position.x, start.position.y, start.position.z)
+    //        print("End Positino", end.position.x, end.position.y, end.position.z)
+    //
+    //
+    //        let line = SCNGeometry.line(from: start.position, to: end.position)
+    //
+    //        //        let newVectorStart = SCNVector3Make(start.position.x, start.position.y + 5, start.position.z)
+    //        //        let newVectorEnd = SCNVector3Make(end.position.x, end.position.y + 5, end.position.z)
+    //
+    //        let lineNode = SCNNode(geometry: line)
+    //        lineNode.position = SCNVector3Zero
+    //        sceneView.scene.rootNode.addChildNode(lineNode)
+    //
+    //
+    //        //                for _ in 1...10 {
+    //        //                    start.position.x -= 0.04
+    //        ////                    start.position.z += 0.008
+    //        //                    end.position.x += 0.04
+    //        ////                    end.position.z -= 0.008
+    //        //
+    //        //                }
+    //
+    //        //        start.eulerAngles.x = -.pi/2
+    //        //        end.eulerAngles.x = -.pi/2
+    //
+    //
+    //        for _ in 1...20 {
+    //            //                    start.position.x -= 0.03
+    //            start.position.y += 0.03
+    //            //                    end.position.x += 0.03
+    //            end.position.y += 0.03
+    //
+    //            let node = lineBetweenNodes(positionA: start.position, positionB: end.position, inScene: sceneView.scene)
+    //            sceneView.scene.rootNode.addChildNode(node)
+    //
+    //        }
+    //        //
+    //        for _ in 1...20 {
+    //            //                    start2.position.x -= 0.03
+    //            start2.position.y -= 0.03
+    //            //                    end2.position.x += 0.03
+    //            end2.position.y -= 0.03
+    //
+    //            let line = SCNGeometry.line(from: start2.position, to: end2.position)
+    //
+    //            let lineNode = SCNNode(geometry: line)
+    //            lineNode.position = SCNVector3Zero
+    //            sceneView.scene.rootNode.addChildNode(lineNode)
+    //
+    //        }
+    //
+    //
+    //
+    //    }
     //
     //    func drawMiddleNode(middlePosition: SCNVector3) {
     //        let dotGeo = SCNSphere(radius: 0.005)
@@ -384,20 +397,20 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         return abs(sqrt(pow(a, 2) + pow(b, 2) + pow(c, 2)))
     }
     
-//    func addText(text: String, hitResult: SCNNode) {
-//        let textGeometry = SCNText(string: text, extrusionDepth: 1.0)
-//
-//        textGeometry.firstMaterial?.diffuse.contents = UIColor.blue
-//
-//        let textNode = SCNNode(geometry: textGeometry)
-//
-//        textNode.position =  SCNVector3(x: hitResult.position.x, y: hitResult.position.y + 0.1, z: hitResult.position.z)
-//        textNode.scale = SCNVector3(0.01, 0.01, 0.0)
-//
-//        rulerNodes.append(textNode)
-//
-//        sceneView.scene.rootNode.addChildNode(textNode)
-//    }
+    //    func addText(text: String, hitResult: SCNNode) {
+    //        let textGeometry = SCNText(string: text, extrusionDepth: 1.0)
+    //
+    //        textGeometry.firstMaterial?.diffuse.contents = UIColor.blue
+    //
+    //        let textNode = SCNNode(geometry: textGeometry)
+    //
+    //        textNode.position =  SCNVector3(x: hitResult.position.x, y: hitResult.position.y + 0.1, z: hitResult.position.z)
+    //        textNode.scale = SCNVector3(0.01, 0.01, 0.0)
+    //
+    //        rulerNodes.append(textNode)
+    //
+    //        sceneView.scene.rootNode.addChildNode(textNode)
+    //    }
     
     //    https://gist.github.com/GrantMeStrength/62364f8a5d7ea26e2b97b37207459a10
     func lineBetweenNodes(positionA: SCNVector3, positionB: SCNVector3, inScene: SCNScene, lengthMultiple: Float=1.00) -> SCNNode {

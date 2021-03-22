@@ -28,9 +28,9 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="GC2-wr-QcD">
-                                <rect key="frame" x="306" y="106" width="75" height="30"/>
+                                <rect key="frame" x="312" y="106" width="64" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="RulerMode"/>
+                                <state key="normal" title="Ruler: On"/>
                                 <connections>
                                     <action selector="gridButtonTapped:" destination="BV1-FR-VrT" eventType="touchUpInside" id="58U-R1-kb3"/>
                                 </connections>
