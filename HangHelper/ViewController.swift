@@ -34,7 +34,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         sceneView.showsStatistics = true
         
         sceneView.autoenablesDefaultLighting = true
-
+        
         
         //        // Create a new scene
         //        let scene = SCNScene(named: "art.scnassets/ship.scn")!
@@ -70,7 +70,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             
             if !results.isEmpty {
                 print("touched plane")
-//                print(results.first?.worldTransform.columns.3.x, results.first?.worldTransform.columns.3.y, results.first?.worldTransform.columns.3.z)
+                //                print(results.first?.worldTransform.columns.3.x, results.first?.worldTransform.columns.3.y, results.first?.worldTransform.columns.3.z)
                 let hitResult = (results.first!)
                 addDot(at: hitResult)
             } else {
@@ -112,10 +112,28 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         nodes.append(dotNode)
         
         if nodes.count >= 2 {
-            calculate()
+            calculateDistance()
         }
         
     }
+    
+    func calculateDistance() {
+        
+        let start = nodes[0]
+        let end = nodes[1]
+        
+        let distanceInMeters = distanceBetweenNodes(start: start, end: end)
+        let meters = MeterToInches(meter: distanceInMeters)
+        textNode = createTextNode(meters.toFeetAndInches())
+        textNode.position = middlePosition(first: start.position, second: end.position)
+        sceneView.scene.rootNode.addChildNode(textNode)
+        
+        lineBetweenNode = lineBetweenNodes(positionA: start.position, positionB: end.position, inScene: sceneView.scene)
+        sceneView.scene.rootNode.addChildNode(lineBetweenNode)
+        
+        
+    }
+    
     
     func calculate() {
         let start2 = nodes[0].clone()
@@ -131,84 +149,83 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         sceneView.scene.rootNode.addChildNode(textNode)
         
         let node = lineBetweenNodes(positionA: start.position, positionB: end.position, inScene: sceneView.scene)
-            sceneView.scene.rootNode.addChildNode(node)
+        sceneView.scene.rootNode.addChildNode(node)
         
         
-//        let lineBetweenNode = getLineBetweenNode(node1: start, node2: end)
-//        sceneView.scene.rootNode.addChildNode(lineBetweenNode)
+        //        let lineBetweenNode = getLineBetweenNode(node1: start, node2: end)
+        //        sceneView.scene.rootNode.addChildNode(lineBetweenNode)
         
         print("Start position", start.position.x, start.position.y, start.position.z)
         print("End Positino", end.position.x, end.position.y, end.position.z)
-
+        
         
         let line = SCNGeometry.line(from: start.position, to: end.position)
         
-//        let newVectorStart = SCNVector3Make(start.position.x, start.position.y + 5, start.position.z)
-//        let newVectorEnd = SCNVector3Make(end.position.x, end.position.y + 5, end.position.z)
-
+        //        let newVectorStart = SCNVector3Make(start.position.x, start.position.y + 5, start.position.z)
+        //        let newVectorEnd = SCNVector3Make(end.position.x, end.position.y + 5, end.position.z)
+        
         let lineNode = SCNNode(geometry: line)
         lineNode.position = SCNVector3Zero
         sceneView.scene.rootNode.addChildNode(lineNode)
-
-        
-//        for _ in 1...10 {
-//            start.position.x -= 0.04
-//            start.position.z += 0.008
-//            end.position.x += 0.04
-//            end.position.z -= 0.008
-//
-//        }
-        
-//        start.eulerAngles.x = -.pi/2
-//        end.eulerAngles.x = -.pi/2
-
-    
-//        for _ in 1...20 {
-//            start.position.y += 0.03
-//            end.position.y += 0.03
-//
-//            let line = SCNGeometry.line(from: start.position, to: end.position)
-//
-//            let lineNode = SCNNode(geometry: line)
-//            lineNode.position = SCNVector3Zero
-//            sceneView.scene.rootNode.addChildNode(lineNode)
-//
-//        }
-//
-//        for _ in 1...20 {
-//            start2.position.y -= 0.03
-//            end2.position.y -= 0.03
-//
-//            let line = SCNGeometry.line(from: start2.position, to: end2.position)
-//
-//            let lineNode = SCNNode(geometry: line)
-//            lineNode.position = SCNVector3Zero
-//            sceneView.scene.rootNode.addChildNode(lineNode)
-//
-//        }
         
         
-//        drawMiddleNode(middlePosition: middlePosition(first: start.position, second: end.position))
+//                for _ in 1...10 {
+//                    start.position.x -= 0.04
+////                    start.position.z += 0.008
+//                    end.position.x += 0.04
+////                    end.position.z -= 0.008
+//
+//                }
+        
+        //        start.eulerAngles.x = -.pi/2
+        //        end.eulerAngles.x = -.pi/2
+        
+        
+                for _ in 1...20 {
+//                    start.position.x -= 0.03
+                    start.position.y += 0.03
+//                    end.position.x += 0.03
+                    end.position.y += 0.03
+        
+                    let node = lineBetweenNodes(positionA: start.position, positionB: end.position, inScene: sceneView.scene)
+                    sceneView.scene.rootNode.addChildNode(node)
+        
+                }
+        //
+                for _ in 1...20 {
+//                    start2.position.x -= 0.03
+                    start2.position.y -= 0.03
+//                    end2.position.x += 0.03
+                    end2.position.y -= 0.03
+        
+                    let line = SCNGeometry.line(from: start2.position, to: end2.position)
+        
+                    let lineNode = SCNNode(geometry: line)
+                    lineNode.position = SCNVector3Zero
+                    sceneView.scene.rootNode.addChildNode(lineNode)
+        
+                }
+        
         
         
     }
-//
-//    func drawMiddleNode(middlePosition: SCNVector3) {
-//        let dotGeo = SCNSphere(radius: 0.005)
-//        let material = SCNMaterial()
-//        material.diffuse.contents = UIColor.green
-//
-//        dotGeo.materials = [material]
-//
-//        middleNode = SCNNode(geometry: dotGeo)
-//
-//        middleNode.position = middlePosition
-//
-//        sceneView.scene.rootNode.addChildNode(middleNode)
-//
-//        nodes.append(middleNode)
-//
-//    }
+    //
+    //    func drawMiddleNode(middlePosition: SCNVector3) {
+    //        let dotGeo = SCNSphere(radius: 0.005)
+    //        let material = SCNMaterial()
+    //        material.diffuse.contents = UIColor.green
+    //
+    //        dotGeo.materials = [material]
+    //
+    //        middleNode = SCNNode(geometry: dotGeo)
+    //
+    //        middleNode.position = middlePosition
+    //
+    //        sceneView.scene.rootNode.addChildNode(middleNode)
+    //
+    //        nodes.append(middleNode)
+    //
+    //    }
     
     func createTextNode(_ text : String) -> SCNNode {
         
@@ -218,11 +235,11 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // Bubble text
         let bubble = SCNText(string: text, extrusionDepth: CGFloat(bubbleDepth))
         let font = UIFont(name: "Futura", size: 0.15)
-//        font = font?.withTraits(traits: .traitBold)
+        //        font = font?.withTraits(traits: .traitBold)
         bubble.font = font
         bubble.alignmentMode = CATextLayerAlignmentMode.center.rawValue
         bubble.firstMaterial?.diffuse.contents = UIColor.orange
-//        bubble.firstMaterial?.specular.contents = UIColor.white
+        //        bubble.firstMaterial?.specular.contents = UIColor.white
         bubble.firstMaterial?.isDoubleSided = true
         bubble.chamferRadius = CGFloat(bubbleDepth)
         
@@ -230,7 +247,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         let (minBound, maxBound) = bubble.boundingBox
         let bubbleNode = SCNNode(geometry: bubble)
         // Centre Node - to Centre-Bottom point
-        bubbleNode.pivot = SCNMatrix4MakeTranslation( (maxBound.x - minBound.x)/2, minBound.y, bubbleDepth/2)
+        bubbleNode.pivot = SCNMatrix4MakeTranslation( (maxBound.x - minBound.x)/2, minBound.y - 0.05, bubbleDepth/2)
         // Reduce default text size
         bubbleNode.scale = SCNVector3Make(0.2, 0.2, 0.2)
         
@@ -249,8 +266,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     }
     
     func distanceBetweenNodes(start: SCNNode, end: SCNNode) -> Float {
-//        let start = nodes[0]
-//        let end = nodes[1]
+        //        let start = nodes[0]
+        //        let end = nodes[1]
         
         let a = end.position.x - start.position.x
         let b = end.position.y - start.position.y
@@ -272,50 +289,50 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         sceneView.scene.rootNode.addChildNode(textNode)
     }
     
-//    https://gist.github.com/GrantMeStrength/62364f8a5d7ea26e2b97b37207459a10
-    func lineBetweenNodes(positionA: SCNVector3, positionB: SCNVector3, inScene: SCNScene) -> SCNNode {
-            let vector = SCNVector3(positionA.x - positionB.x, positionA.y - positionB.y, positionA.z - positionB.z)
-            let distance = sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z)
-            let midPosition = SCNVector3 (x:(positionA.x + positionB.x) / 2, y:(positionA.y + positionB.y) / 2, z:(positionA.z + positionB.z) / 2)
-
-            let lineGeometry = SCNCylinder()
-            lineGeometry.radius = 0.002
-            lineGeometry.height = CGFloat(distance)
-            lineGeometry.radialSegmentCount = 5
-            lineGeometry.firstMaterial!.diffuse.contents = UIColor.green
-
-            let lineNode = SCNNode(geometry: lineGeometry)
-            lineNode.position = midPosition
-            lineNode.look(at: positionB, up: inScene.rootNode.worldUp, localFront: lineNode.worldUp)
-            return lineNode
-        }
+    //    https://gist.github.com/GrantMeStrength/62364f8a5d7ea26e2b97b37207459a10
+    func lineBetweenNodes(positionA: SCNVector3, positionB: SCNVector3, inScene: SCNScene, timesLength: Float=1.00) -> SCNNode {
+        let vector = SCNVector3(positionA.x - positionB.x, positionA.y - positionB.y, positionA.z - positionB.z)
+        let distance = sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z)
+        let midPosition = SCNVector3 (x:(positionA.x + positionB.x) / 2, y:(positionA.y + positionB.y) / 2, z:(positionA.z + positionB.z) / 2)
+        
+        let lineGeometry = SCNCylinder()
+        lineGeometry.radius = 0.002
+        lineGeometry.height = CGFloat(distance*timesLength)
+        lineGeometry.radialSegmentCount = 5
+        lineGeometry.firstMaterial!.diffuse.contents = UIColor.green
+        
+        let lineNode = SCNNode(geometry: lineGeometry)
+        lineNode.position = midPosition
+        lineNode.look(at: positionB, up: inScene.rootNode.worldUp, localFront: lineNode.worldUp)
+        return lineNode
+    }
     
     
-////    https://stackoverflow.com/questions/35002232/draw-scenekit-object-between-two-points
-//    func getLineBetweenNode(node1: SCNNode, node2: SCNNode) -> SCNNode {
-//        let line = SCNCylinder(radius: 0.002, height: CGFloat(distanceBetweenNodes(start: node1, end: node2)))
-//
-//        let material = SCNMaterial()
-//        material.diffuse.contents = UIColor.red
-//        material.lightingModel = .phong
-//        line.materials = [material]
-//
-//        lineBetweenNode.geometry = line
-//        lineBetweenNode.position = middlePosition(first: node1.position, second: node2.position)
-//
-//        let betweenVector = SCNVector3Make(node2.position.x - node1.position.x, node2.position.y - node1.position.y, node2.position.z - node1.position.z)
-//
-//        // Get Y rotation in radians
-//        let yAngle = atan(betweenVector.y / betweenVector.z)
-//
-//        // Rotate cylinder node about X axis so cylinder is laying down
-//        lineBetweenNode.eulerAngles.x = .pi / 2
-//
-//        // Rotate cylinder node about Y axis so cylinder is pointing to each node
-//        lineBetweenNode.eulerAngles.y = yAngle
-//        return lineBetweenNode
-//
-//    }
+    ////    https://stackoverflow.com/questions/35002232/draw-scenekit-object-between-two-points
+    //    func getLineBetweenNode(node1: SCNNode, node2: SCNNode) -> SCNNode {
+    //        let line = SCNCylinder(radius: 0.002, height: CGFloat(distanceBetweenNodes(start: node1, end: node2)))
+    //
+    //        let material = SCNMaterial()
+    //        material.diffuse.contents = UIColor.red
+    //        material.lightingModel = .phong
+    //        line.materials = [material]
+    //
+    //        lineBetweenNode.geometry = line
+    //        lineBetweenNode.position = middlePosition(first: node1.position, second: node2.position)
+    //
+    //        let betweenVector = SCNVector3Make(node2.position.x - node1.position.x, node2.position.y - node1.position.y, node2.position.z - node1.position.z)
+    //
+    //        // Get Y rotation in radians
+    //        let yAngle = atan(betweenVector.y / betweenVector.z)
+    //
+    //        // Rotate cylinder node about X axis so cylinder is laying down
+    //        lineBetweenNode.eulerAngles.x = .pi / 2
+    //
+    //        // Rotate cylinder node about Y axis so cylinder is pointing to each node
+    //        lineBetweenNode.eulerAngles.y = yAngle
+    //        return lineBetweenNode
+    //
+    //    }
     
     func middlePosition(first: SCNVector3, second: SCNVector3) -> SCNVector3 {
         return SCNVector3Make((first.x + second.x) / 2, (first.y + second.y) / 2, (first.z + second.z) / 2)
@@ -332,15 +349,15 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             planeNode.position = SCNVector3(x: planeAnchor.center.x, y: 0, z: planeAnchor.center.z)
             planeNode.transform = SCNMatrix4MakeRotation(-Float.pi/2, 1, 0, 0)
             
-//            let gridMaterial = SCNMaterial()
-//
-//            gridMaterial.diffuse.contents = UIImage(named: "art.scnassets/grid.png")
-//
-//            plane.materials = [gridMaterial]
-//
-//            planeNode.geometry = plane
-//
-//            node.addChildNode(planeNode)
+            //            let gridMaterial = SCNMaterial()
+            //
+            //            gridMaterial.diffuse.contents = UIImage(named: "art.scnassets/grid.png")
+            //
+            //            plane.materials = [gridMaterial]
+            //
+            //            planeNode.geometry = plane
+            //
+            //            node.addChildNode(planeNode)
             print("plane!")
             
         } else {
@@ -391,55 +408,3 @@ extension SCNGeometry {
         return SCNGeometry(sources: [source], elements: [element])
     }
 }
-
-///looks like y is the thing that's getting smaller when you go up
-//Start position -0.013950694 -0.29768142 -0.8087494
-//End Positino 0.10948597 -0.29737473 -0.824081
-//touched plane
-//touched plane
-//Start position -0.0124802925 -0.123720184 -0.80968
-//End Positino 0.09759191 -0.12262655 -0.8233552
-//touched plane
-//touched plane
-//Start position -0.015157804 -0.027880251 -0.81265146
-//End Positino 0.08202456 -0.025717713 -0.8261197
-
-
-//Start position -0.045311995 -0.2245927 -0.35887483
-//End Positino -0.013480216 -0.21830407 -0.35993907
-//touched plane
-//touched plane
-//Start position -0.11578967 -0.18739304 -0.35763702
-//End Positino 0.096940465 -0.1807105 -0.36483467
-//touched plane
-//touched plane
-//Start position -0.13999453 -0.022936732 -0.360219
-//End Positino 0.11313399 -0.020511314 -0.3686698
-
-
-//Start position -0.19611076 -0.04121199 -0.53352785
-//End Positino -0.10675386 -0.042285185 -0.55700594
-//touched plane
-//touched plane
-//Start position -0.35618916 -0.0049450807 -0.48500314
-//End Positino 0.09505594 0.008563001 -0.6164749
-//touched plane
-//touched plane
-//Start position -0.46825647 0.1032953 -0.46887752
-//End Positino 0.11511024 0.13835233 -0.64191765
-//touched plane
-//touched plane
-//Start position -0.5193834 0.23614614 -0.4532935
-//End Positino 0.16265216 0.25515363 -0.6586266
-
-
-//Start position -0.09637158 0.06756115 -0.5898814
-//End Positino 0.1622802 0.058914587 -0.6406032
-//touched plane
-//touched plane
-//Start position -0.3652835 0.06285457 -0.525276
-//End Positino 0.5385894 0.0720004 -0.68492454
-
-
-//start: x = -.27, z = +.05
-//end: x = .37, z = -.04
