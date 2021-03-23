@@ -16,6 +16,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     let planeDetectLabel = UILabel()
     var rulerNodes = [SCNNode]()
     let bubbleDepth: Float = 0.01
+    
+    let planeNode = SCNNode()
 
     var gridNodes = [SCNNode]()
     var gridMode = false
@@ -37,13 +39,6 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         sceneView.showsStatistics = true
         
         sceneView.autoenablesDefaultLighting = true
-        
-        
-        //        // Create a new scene
-        //        let scene = SCNScene(named: "art.scnassets/ship.scn")!
-        //
-        //        // Set the scene to the view
-        //        sceneView.scene = scene
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -52,9 +47,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // Create a session configuration
         let configuration = ARWorldTrackingConfiguration()
         
-        // Probably don't need this
+        // Detecting vertical plane
         configuration.planeDetection = .vertical
-        
         
         // Run the view's session
         sceneView.session.run(configuration)
@@ -62,7 +56,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     
     
     @IBAction func clearButton(_ sender: UIButton) {
-        //        print("tapped redo button")
+        // IF WANT TO REDO
         //        if rulerNodes.count > 0 {
         //            let poppedNode = rulerNodes.popLast()
         //            poppedNode?.removeFromParentNode()
@@ -72,7 +66,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
                 node.removeFromParentNode()
             }
         }
-        
+        // Delete all the nodes from grid, not enabled for now
         //        if gridNodes.count > 0 {
         //            for node in gridNodes {
         //                node.removeFromParentNode()
@@ -99,24 +93,21 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             //            let results = sceneView.hitTest(touchLocation, types: .existingPlane)
             
             let rayResults = sceneView.raycastQuery(from: touchLocation, allowing: .existingPlaneInfinite, alignment: .vertical)!
-            
             let results = sceneView.session.raycast(rayResults)
             
             if !results.isEmpty {
                 if let hitResult = results.first {
-                    
                     if !gridMode {
                         addDotForRuler(at: hitResult)
                     } else {
                         addDotForGrid(at: hitResult)
                     }
+                    planeNode.removeFromParentNode()
                 }
             } else {
                 print("touched somewhere else")
             }
         }
-        
-        
     }
     
     func resetRuler() {
@@ -125,9 +116,6 @@ class ViewController: UIViewController, ARSCNViewDelegate {
                 node.removeFromParentNode()
             }
             rulerNodes = []
-            //            textNode.removeFromParentNode()
-            //            middleNode.removeFromParentNode()
-            //            lineBetweenNode.removeFromParentNode()
         }
     }
     
@@ -146,18 +134,14 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     func addDotForRuler(at hitResult: ARRaycastResult) {
         
         dotCount += 1
-        //        resetRuler()
         let dot = createDot(position: hitResult)
-        
         sceneView.scene.rootNode.addChildNode(dot)
-        
         rulerNodes.append(dot)
         
         if rulerNodes.count >= 2 && dotCount == 2{
             calculateDistance(start: rulerNodes[rulerNodes.count-1], end: rulerNodes[rulerNodes.count-2])
             dotCount = 0
         }
-        
     }
     
     func addDotForGrid(at position: ARRaycastResult) {
@@ -171,21 +155,16 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         if gridNodes.count == 2 {
             generateGrid(start: gridNodes[0], end: gridNodes[1])
         }
-        
     }
     
     func resetGrid() {
         for node in gridNodes {
             node.removeFromParentNode()
         }
-        
         gridNodes = []
     }
     
     func generateGrid(start: SCNNode, end: SCNNode) {
-//        let start2 = start.clone()
-//        let end2 = end.clone()
-        
         let startVerticle = start.clone()
         let endVerticle = end.clone()
         startVerticle.position.x = end.position.y
@@ -197,9 +176,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         gridNodes.append(node)
         sceneView.scene.rootNode.addChildNode(node)
         
-//        let verticalline = getLineBetweenNode(node1: start, node2: end)
-//        sceneView.scene.rootNode.addChildNode(verticalline)
-        
+        // Horizontal lines from position to the top
         for _ in 1...20 {
             start.position.y += 0.03
             end.position.y += 0.03
@@ -210,10 +187,11 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             
         }
         
+        // Resetting the node's position back to original
         start.position.y -= (0.03 * 19)
         end.position.y -= (0.03 * 19)
-    
         
+        // Horizontal lines from position to the bottom
         for _ in 1...20 {
             start.position.y -= 0.03
             end.position.y -= 0.03
@@ -224,6 +202,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             
         }
         
+        // Vertical lines from position to the right
         for _ in 1...30 {
             startVerticle.position.x += 0.03
             endVerticle.position.x += 0.03
@@ -234,9 +213,11 @@ class ViewController: UIViewController, ARSCNViewDelegate {
 
         }
         
+        // Reset nodes' positions to original positions
         startVerticle.position.x -= (0.03 * 29)
         endVerticle.position.x -= (0.03 * 29)
         
+        // Vertical lines from position to the left
         for _ in 1...20 {
             startVerticle.position.x -= 0.03
             endVerticle.position.x -= 0.03
@@ -263,13 +244,10 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         let lineBetweenNode = lineBetweenNodes(positionA: start.position, positionB: end.position, inScene: sceneView.scene)
         rulerNodes.append(lineBetweenNode)
         sceneView.scene.rootNode.addChildNode(lineBetweenNode)
-        
-
     }
     
     
     func createTextNode(_ text : String) -> SCNNode {
-        
         let billboardConstraint = SCNBillboardConstraint()
         billboardConstraint.freeAxes = SCNBillboardAxis.Y
         
@@ -355,20 +333,16 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             let planeAnchor = anchor as! ARPlaneAnchor
             
             let plane = SCNPlane(width: CGFloat(planeAnchor.extent.x), height: CGFloat(planeAnchor.extent.z))
-            let planeNode = SCNNode()
             
             planeNode.position = SCNVector3(x: planeAnchor.center.x, y: 0, z: planeAnchor.center.z)
             planeNode.transform = SCNMatrix4MakeRotation(-Float.pi/2, 1, 0, 0)
             
-            //            let gridMaterial = SCNMaterial()
-            //
-            //            gridMaterial.diffuse.contents = UIImage(named: "art.scnassets/grid.png")
-            //
-            //            plane.materials = [gridMaterial]
-            //
-            //            planeNode.geometry = plane
-            //
-            //            node.addChildNode(planeNode)
+            let gridMaterial = SCNMaterial()
+            gridMaterial.diffuse.contents = UIImage(named: "art.scnassets/grid.png")
+            plane.materials = [gridMaterial]
+            planeNode.geometry = plane
+
+            node.addChildNode(planeNode)
             DispatchQueue.main.async {
                 self.planeDetectLabel.text = "Plane Detected!"
                 self.planeDetectLabel.textColor = .green
