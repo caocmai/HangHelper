@@ -16,7 +16,6 @@ struct MeterToInches {
         
         if inches > 12.0 {
             let feet = Int(inches) / 12
-            
             inches = inches - Float(feet * 12)
             
             return String(feet) + "'" + numToString(number: inches) + "in"
