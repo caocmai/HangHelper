@@ -19,6 +19,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     var rulerNodes = [SCNNode]()
     let bubbleDepth: Float = 0.01
     
+    var alternateColor = false
+    
     let planeNode = SCNNode()
     var isPlaneDetected = false
 
@@ -274,10 +276,10 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         sceneView.scene.rootNode.addChildNode(node)
         
         // Horizontal lines from position to the top
-        for _ in 1...20 {
+        for _ in 1...21 {
             start.position.y += 0.03
             end.position.y += 0.03
-            
+                        
             let node = lineBetweenNodes(positionA: start.position, positionB: end.position, inScene: sceneView.scene, lengthMultiple: 10)
             gridNodes.append(node)
             sceneView.scene.rootNode.addChildNode(node)
@@ -285,14 +287,14 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         }
         
         // Resetting the node's position back to original
-        start.position.y -= (0.03 * 19)
-        end.position.y -= (0.03 * 19)
+        start.position.y -= (0.03 * 20)
+        end.position.y -= (0.03 * 20)
         
         // Horizontal lines from position to the bottom
         for _ in 1...20 {
             start.position.y -= 0.03
             end.position.y -= 0.03
-            
+                        
             let node = lineBetweenNodes(positionA: start.position, positionB: end.position, inScene: sceneView.scene, lengthMultiple: 10)
             gridNodes.append(node)
             sceneView.scene.rootNode.addChildNode(node)
@@ -300,10 +302,10 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         }
         
         // Vertical lines from position to the right
-        for _ in 1...30 {
+        for _ in 1...31 {
             startVerticle.position.x += 0.03
             endVerticle.position.x += 0.03
-
+            
             let node = lineBetweenNodes(positionA: startVerticle.position, positionB: endVerticle.position, inScene: sceneView.scene, lengthMultiple: 10)
             gridNodes.append(node)
             sceneView.scene.rootNode.addChildNode(node)
@@ -311,14 +313,14 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         }
         
         // Reset nodes' positions to original positions
-        startVerticle.position.x -= (0.03 * 29)
-        endVerticle.position.x -= (0.03 * 29)
+        startVerticle.position.x -= (0.03 * 30)
+        endVerticle.position.x -= (0.03 * 30)
         
         // Vertical lines from position to the left
-        for _ in 1...20 {
+        for _ in 1...30 {
             startVerticle.position.x -= 0.03
             endVerticle.position.x -= 0.03
-
+            
             let node = lineBetweenNodes(positionA: startVerticle.position, positionB: endVerticle.position, inScene: sceneView.scene, lengthMultiple: 10)
             gridNodes.append(node)
             sceneView.scene.rootNode.addChildNode(node)
@@ -403,7 +405,13 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         if gridMode {
             lineGeometry.radius = 0.0005
-            lineGeometry.firstMaterial!.diffuse.contents = UIColor.red
+            if !alternateColor {
+                lineGeometry.firstMaterial!.diffuse.contents = UIColor.red
+                alternateColor = true
+            } else {
+                alternateColor = false
+                lineGeometry.firstMaterial!.diffuse.contents = UIColor.gray
+            }
         } else {
             lineGeometry.radius = 0.002
             lineGeometry.firstMaterial!.diffuse.contents = UIColor.green
