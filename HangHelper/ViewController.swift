@@ -18,6 +18,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     let bubbleDepth: Float = 0.01
     
     let planeNode = SCNNode()
+    var isPlaneDetected = false
 
     var gridNodes = [SCNNode]()
     var gridMode = false
@@ -328,7 +329,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     
     
     func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
-        if anchor is ARPlaneAnchor {
+        if anchor is ARPlaneAnchor && !isPlaneDetected{
             
             let planeAnchor = anchor as! ARPlaneAnchor
             
@@ -343,6 +344,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             planeNode.geometry = plane
 
             node.addChildNode(planeNode)
+            isPlaneDetected = true // to restrict detecting plane only once
             DispatchQueue.main.async {
                 self.planeDetectLabel.text = "Plane Detected!"
                 self.planeDetectLabel.textColor = .green
