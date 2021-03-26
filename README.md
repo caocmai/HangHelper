@@ -5,7 +5,7 @@ An iOS application to get the measurement between two nodes as well as generatin
 Using Swift ARKit to determine the measurement in feet and inches between two points. Using two points, ideally from an object you know is level, a grid can also be generated to help the user get a idea of where to hang objects on the wall.
 
 ### App Screencast
-* [Link](https://drive.google.com/file/d/1pneZ0h8_ZQk3BxH8KZIq99A_KYvO-jI_/view?usp=sharing)
+* [Link](ProjectGif/project.gif)
 
 
 ### Usage
